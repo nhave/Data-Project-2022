@@ -31,6 +31,7 @@ class WindowMain(QMainWindow):
         self.actionAbout.triggered.connect(self.about)
         self.actionExport.triggered.connect(self.exportItems)
         self.actionImport.triggered.connect(self.importItems)
+        self.actionSave.triggered.connect(self.saveItems)
         self.actionAdd.triggered.connect(self.addItem)
         self.actionEdit.triggered.connect(self.editItem)
         self.actionRemove.triggered.connect(self.removeItem)
@@ -48,20 +49,33 @@ class WindowMain(QMainWindow):
     def addItem(self):
         # packages.append(["ID", "Pakke", "Antal", "Dato"])
         # self.updateItems()
-        self.windowadd = WindowAdd(False)
+        self.windowadd = WindowAdd(self, False)
         self.windowadd.show()
 
     def editItem(self):
         # packages.append(["ID", "Pakke", "Antal", "Dato"])
         # self.updateItems()
-        self.windowadd = WindowAdd(True)
+        self.windowadd = WindowAdd(self, True)
         self.windowadd.show()
 
     def removeItem(self):
-        # if(len(packages) > 0):
-        #     packages.pop(len(packages) -1)
-        #     self.updateItems()
-        pass
+        row = self.tableItems.currentItem().row()
+        # print(row)
+
+        msg = ""
+        for i in range(len(rows)):
+            msg += "<br>" + rows[i] + ": " + packages[row][i]
+            pass
+
+        reply = QMessageBox.critical(self, 'Remove',
+        "Are you sure you want to remove" + msg, 
+        QMessageBox.Yes | QMessageBox.No,
+        QMessageBox.No)
+
+        if reply == QMessageBox.Yes:
+            if(len(packages) > 0):
+                packages.pop(row)
+                self.updateItems()
 
     def updateItems(self):
         _translate = QtCore.QCoreApplication.translate
@@ -81,8 +95,14 @@ class WindowMain(QMainWindow):
                 item = QtWidgets.QTableWidgetItem()
                 item.setText(packages[row][column])
                 self.tableItems.setItem(row, column, item)
+        
+        self.actionRemove.setEnabled(len(packages) > 0)
+        self.actionEdit.setEnabled(len(packages) > 0)
 
     def exportItems(self):
+        # filename = config.getString("last_file", "")
+        # path = Path(config.getString("last_file", ""))
+
         filename, ok = QFileDialog.getSaveFileName(
             self,
             "Export Database",
@@ -96,8 +116,22 @@ class WindowMain(QMainWindow):
             with open(path, 'w', encoding='utf8') as json_file:
                 json.dump(packages, json_file, sort_keys=True, ensure_ascii=False)
     
+    def saveItems(self):
+        filename = config.getString("last_file", "")
+        path = Path(filename)
+        if not path.is_file() or not filename.lower().endswith(".ntdb"):
+            self.exportItems()
+            return
+
+        config.setString("last_file", filename)
+        config.save()
+        with open(path, 'w', encoding='utf8') as json_file:
+            json.dump(packages, json_file, sort_keys=True, ensure_ascii=False)
+
     def importItems(self):
         global packages
+
+        # last_file = config.getString("last_file", "./")
 
         filename, ok = QFileDialog.getOpenFileName(
             self,
@@ -128,7 +162,7 @@ class WindowMain(QMainWindow):
         #     pass
 
 class WindowAdd(QMainWindow):
-    def __init__(self, edit):
+    def __init__(self, parentWindow, edit):
         super(WindowAdd, self).__init__()
         uic.loadUi(resourcePath('add.ui'), self)
         self.setWindowIcon(QtGui.QIcon(resourcePath('icon.ico')))
@@ -139,15 +173,44 @@ class WindowAdd(QMainWindow):
         self.setWindowModality(QtCore.Qt.ApplicationModal)
         self.setFixedSize(400, 208)
         self.connectSignalSlots()
-
-        self.edit = edit
+        self.parentWindow = parentWindow
+        self.updateLines(edit)
     
     def connectSignalSlots(self):
         self.buttonCalendar.clicked.connect(self.openCalendar)
         self.buttonDone.clicked.connect(self.done)
         self.buttonCancel.clicked.connect(self.close)
+
+    def updateLines(self, edit):
+        self.edit = edit
+        if edit:
+            row = self.parentWindow.tableItems.currentItem().row()
+            self.lineEditID.setText(packages[row][0])
+            self.lineEditContent.setText(packages[row][1])
+            self.lineEditAmount.setText(packages[row][2])
+            self.lineEditDate.setText(packages[row][3])
     
     def done(self):
+        id = self.lineEditID.text()
+        content = self.lineEditContent.text()
+        amount = self.lineEditAmount.text()
+        date = self.lineEditDate.text()
+
+        if len(id) < 1 or len(content) < 1 or len(amount) < 1 or len(date) < 1:
+            reply = QMessageBox.critical(self, 'Error',
+            "Lines cannot be empty!", 
+            QMessageBox.Ok)
+
+            if reply == QMessageBox.Ok:
+                return
+
+        if not self.edit:
+            packages.append([id, content, amount, date])
+        else:
+            row = self.parentWindow.tableItems.currentItem().row()
+            packages[row] = [id, content, amount, date]
+
+        self.parentWindow.updateItems()
         self.close()
 
     def openCalendar(self):
