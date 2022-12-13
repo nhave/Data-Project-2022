@@ -41,7 +41,8 @@ class WindowMain(QMainWindow):
             "N-TECH Package Manager",
             "<p>Et concept af et program til at registrere pakker.</p>"
             "Version: 1.0.0<br>"
-            "Author: NHAVE",
+            "Authors: NHAVE, Uno<br>"
+            "<a href='https://github.com/nhave/Data-Project-2022'>Github</a>"
         )
 
     def addItem(self):
