@@ -7,10 +7,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets, uic
 from PyQt5.QtGui import QPixmap
 from pathlib import Path
 from config import Config
+from language import Lang
 
-# from ui_mainwindow import Ui_MainWindow
-
-rows = ["Package ID", "Content", "Amount", "Date"]
+rows = ["table.package", "table.content", "table.amount", "table.date"]
 packages = []
 
 class WindowMain(QMainWindow):
@@ -18,15 +17,14 @@ class WindowMain(QMainWindow):
         super(WindowMain, self).__init__()
         uic.loadUi(resourcePath('mainwindow.ui'), self)
         self.setWindowIcon(QtGui.QIcon(resourcePath('icon.ico')))
-        # self.setupUi(self)
         self.connectSignalsSlots()
         self.updateItems()
         self.resize(800, 600)
-        
         self.setWindowState(QtCore.Qt.WindowMaximized)
-        # self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+        self.localize()
 
     def connectSignalsSlots(self):
+        # Link Events to their methods.
         self.actionExit.triggered.connect(self.close)
         self.actionAbout.triggered.connect(self.about)
         self.actionExport.triggered.connect(self.exportItems)
@@ -35,40 +33,50 @@ class WindowMain(QMainWindow):
         self.actionAdd.triggered.connect(self.addItem)
         self.actionEdit.triggered.connect(self.editItem)
         self.actionRemove.triggered.connect(self.removeItem)
+        # Adding the Context Menu and its Event.
+        self.tableItems.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.tableItems.customContextMenuRequested.connect(self.contextMenu)
+
+    def contextMenu(self, pos):
+        index = self.tableItems.indexAt(pos)
+        if(index.isValid()):
+            self.contextMenu = QtWidgets.QMenu(self)
+            EditAction = QtWidgets.QAction(lang.translate("context.edit"), self)
+            removeAction = QtWidgets.QAction(lang.translate("context.remove"), self)
+            EditAction.triggered.connect(self.editItem)
+            removeAction.triggered.connect(self.removeItem)
+            self.contextMenu.addAction(EditAction)
+            self.contextMenu.addAction(removeAction)
+            self.contextMenu.popup(QtGui.QCursor.pos())
 
     def about(self):
         QMessageBox.about(
             self,
-            "N-TECH Package Manager",
-            "<p>Et concept af et program til at registrere pakker.</p>"
-            "Version: 1.0.0<br>"
-            "Authors: NHAVE, Uno<br>"
+            lang.translate("main.title"),
+            lang.translate("about.desc") +
+            lang.translate("about.version") + ": 1.0.0<br>" +
+            lang.translate("about.author") + ": NHAVE<br>"
             "<a href='https://github.com/nhave/Data-Project-2022'>Github</a>"
         )
 
     def addItem(self):
-        # packages.append(["ID", "Pakke", "Antal", "Dato"])
-        # self.updateItems()
         self.windowadd = WindowAdd(self, False)
         self.windowadd.show()
 
     def editItem(self):
-        # packages.append(["ID", "Pakke", "Antal", "Dato"])
-        # self.updateItems()
         self.windowadd = WindowAdd(self, True)
         self.windowadd.show()
 
     def removeItem(self):
         row = self.tableItems.currentItem().row()
-        # print(row)
 
         msg = ""
         for i in range(len(rows)):
-            msg += "<br>" + rows[i] + ": " + packages[row][i]
+            msg += "<br>" + lang.translate(rows[i]) + ": " + packages[row][i]
             pass
 
-        reply = QMessageBox.critical(self, 'Remove',
-        "Are you sure you want to remove" + msg, 
+        reply = QMessageBox.critical(self, lang.translate("windowremove.title"),
+        lang.translate("windowremove.message") + msg, 
         QMessageBox.Yes | QMessageBox.No,
         QMessageBox.No)
 
@@ -84,7 +92,8 @@ class WindowMain(QMainWindow):
 
         for row in range(len(rows)):
             item = QtWidgets.QTableWidgetItem()
-            item.setText(_translate("MainWindow", rows[row]))
+            # item.setText(_translate("MainWindow", rows[row]))
+            item.setText(lang.translate(rows[row]))
             self.tableItems.setHorizontalHeaderItem(row, item)
 
         for row in range(len(packages)):
@@ -100,12 +109,9 @@ class WindowMain(QMainWindow):
         self.actionEdit.setEnabled(len(packages) > 0)
 
     def exportItems(self):
-        # filename = config.getString("last_file", "")
-        # path = Path(config.getString("last_file", ""))
-
         filename, ok = QFileDialog.getSaveFileName(
             self,
-            "Export Database",
+            lang.translate("file.export"),
             "./",
             "Database (*.NTDB)"
         )
@@ -135,7 +141,7 @@ class WindowMain(QMainWindow):
 
         filename, ok = QFileDialog.getOpenFileName(
             self,
-            "Import Database",
+            lang.translate("file.import"),
             "./",
             "Database (*.NTDB)"
         )
@@ -152,29 +158,33 @@ class WindowMain(QMainWindow):
             except:
                 pass
 
-        # try:
-        #     with open("test.dat", 'r', encoding='utf8') as f:
-        #         conf = json.load(f)
-        #         if type(conf) == list:
-        #             packages = conf
-        #             self.updateItems()
-        # except:
-        #     pass
+    def localize(self):
+        self.setWindowTitle(lang.translate("windowmain.title"))
+
+        self.menuFile.setTitle(lang.translate("menu.file"))
+        self.menuEdit.setTitle(lang.translate("menu.edit"))
+        self.menuInfo.setTitle(lang.translate("menu.info"))
+
+        self.actionExit.setText(lang.translate("context.exit"))
+        self.actionAbout.setText(lang.translate("context.about"))
+        self.actionExport.setText(lang.translate("context.export"))
+        self.actionImport.setText(lang.translate("context.import"))
+        self.actionSave.setText(lang.translate("context.save"))
+        self.actionAdd.setText(lang.translate("context.add"))
+        self.actionEdit.setText(lang.translate("context.edit"))
+        self.actionRemove.setText(lang.translate("context.remove"))
 
 class WindowAdd(QMainWindow):
     def __init__(self, parentWindow, edit):
         super(WindowAdd, self).__init__()
+        self.parentWindow = parentWindow
         uic.loadUi(resourcePath('add.ui'), self)
         self.setWindowIcon(QtGui.QIcon(resourcePath('icon.ico')))
-        title = "Add"
-        if edit:
-            title = "Edit"
-        self.setWindowTitle(title)
         self.setWindowModality(QtCore.Qt.ApplicationModal)
         self.setFixedSize(400, 208)
         self.connectSignalSlots()
-        self.parentWindow = parentWindow
         self.updateLines(edit)
+        self.localize(edit)
     
     def connectSignalSlots(self):
         self.buttonCalendar.clicked.connect(self.openCalendar)
@@ -197,8 +207,8 @@ class WindowAdd(QMainWindow):
         date = self.lineEditDate.text()
 
         if len(id) < 1 or len(content) < 1 or len(amount) < 1 or len(date) < 1:
-            reply = QMessageBox.critical(self, 'Error',
-            "Lines cannot be empty!", 
+            reply = QMessageBox.critical(self, lang.translate("windowerror.title"),
+            lang.translate("windowerror.message"), 
             QMessageBox.Ok)
 
             if reply == QMessageBox.Ok:
@@ -216,16 +226,32 @@ class WindowAdd(QMainWindow):
     def openCalendar(self):
         self.windowdate = WindowDate(self)
         self.windowdate.show()
+        
+    def localize(self, edit):
+        title = lang.translate("context.add")
+        if edit:
+            title = lang.translate("context.edit")
+        self.setWindowTitle(title)
+
+        self.labelID.setText(lang.translate(rows[0]))
+        self.labelContent.setText(lang.translate(rows[1]))
+        self.labelAmount.setText(lang.translate(rows[2]))
+        self.labelDate.setText(lang.translate(rows[3]))
+
+        self.buttonDone.setText(lang.translate("button.done"))
+        self.buttonCancel.setText(lang.translate("button.cancel"))
+        self.buttonCalendar.setText(lang.translate("button.calendar"))
 
 class WindowDate(QMainWindow):
     def __init__(self, parentWindow):
         super(WindowDate, self).__init__()
+        self.parentWindow = parentWindow
         uic.loadUi(resourcePath('calendar.ui'), self)
         self.setWindowIcon(QtGui.QIcon(resourcePath('icon.ico')))
         self.setWindowModality(QtCore.Qt.ApplicationModal)
         self.setFixedSize(500, 400)
         self.connectSignalSlots()
-        self.parentWindow = parentWindow
+        self.localize()
     
     def connectSignalSlots(self):
         self.buttonSet.clicked.connect(self.setDate)
@@ -238,6 +264,11 @@ class WindowDate(QMainWindow):
         self.parentWindow.lineEditDate.setText(day + "-" + month + "-" + year)
         self.close()
 
+    def localize(self):
+        self.setWindowTitle(lang.translate("windowcalendar.title"))
+        self.buttonSet.setText(lang.translate("button.set"))
+
+# Returns the resource path for assets for use in the EXE file.
 def resourcePath(relativePath):
     try:
         basePath = sys._MEIPASS
@@ -246,6 +277,7 @@ def resourcePath(relativePath):
     
     return os.path.join(basePath, relativePath)
 
+# Defines the config location based on the OS used.
 def getConfigLocation():
     _os = platform.system()
     if (_os == "Linux"):
@@ -254,10 +286,14 @@ def getConfigLocation():
         return os.getenv('APPDATA') + "/N-TECH/NTPKG/"
     return "./"
 
+# Only run if this is the main class
 if __name__ == "__main__":
     config = Config(getConfigLocation() + "conf.json")
     last_file = config.getString("last_file", "")
+    current_lang = config.getString("current_lang", "en_us")
     config.save()
+
+    lang = Lang(resourcePath('lang.json'), current_lang)
 
     try:
         with open(last_file, 'r', encoding='utf8') as f:

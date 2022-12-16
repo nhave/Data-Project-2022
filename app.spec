@@ -25,7 +25,8 @@ a.datas += [
     ('icon.ico', './icon.ico', "DATA"),
     ('mainwindow.ui', './mainwindow.ui', "DATA"),
     ('add.ui', './add.ui', "DATA"),
-    ('calendar.ui', './calendar.ui', "DATA")
+    ('calendar.ui', './calendar.ui', "DATA"),
+    ('lang.json', './lang.json', "DATA")
 ]
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
