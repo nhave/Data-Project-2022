@@ -21,12 +21,12 @@ a = Analysis(
 )
 
 a.datas += [
-    ('splash.png', './splash.png', "DATA"),
-    ('icon.ico', './icon.ico', "DATA"),
-    ('mainwindow.ui', './mainwindow.ui', "DATA"),
-    ('add.ui', './add.ui', "DATA"),
-    ('calendar.ui', './calendar.ui', "DATA"),
-    ('lang.json', './lang.json', "DATA")
+    ('assets/textures/splash.png', './assets/textures/splash.png', "DATA"),
+    ('assets/textures/icon.ico', './assets/textures/icon.ico', "DATA"),
+    ('assets/ui/mainwindow.ui', './assets/ui/mainwindow.ui', "DATA"),
+    ('assets/ui/add.ui', './assets/ui/add.ui', "DATA"),
+    ('assets/ui/calendar.ui', './assets/ui/calendar.ui', "DATA"),
+    ('assets/lang/lang.json', './assets/lang/lang.json', "DATA")
 ]
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)

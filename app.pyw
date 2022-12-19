@@ -15,8 +15,8 @@ packages = []
 class WindowMain(QMainWindow):
     def __init__(self):
         super(WindowMain, self).__init__()
-        uic.loadUi(resourcePath('mainwindow.ui'), self)
-        self.setWindowIcon(QtGui.QIcon(resourcePath('icon.ico')))
+        uic.loadUi(resourcePath('assets/ui/mainwindow.ui'), self)
+        self.setWindowIcon(QtGui.QIcon(resourcePath('assets/textures/icon.ico')))
         self.connectSignalsSlots()
         self.updateItems()
         self.resize(800, 600)
@@ -173,12 +173,13 @@ class WindowMain(QMainWindow):
         self.actionAdd.setText(lang.translate("context.add"))
         self.actionEdit.setText(lang.translate("context.edit"))
         self.actionRemove.setText(lang.translate("context.remove"))
+        self.actionPreferences.setText(lang.translate("context.preferences"))
 
 class WindowAdd(QMainWindow):
     def __init__(self, parentWindow, edit):
         super(WindowAdd, self).__init__()
         self.parentWindow = parentWindow
-        uic.loadUi(resourcePath('add.ui'), self)
+        uic.loadUi(resourcePath('assets/ui/add.ui'), self)
         self.setWindowIcon(QtGui.QIcon(resourcePath('icon.ico')))
         self.setWindowModality(QtCore.Qt.ApplicationModal)
         self.setFixedSize(400, 208)
@@ -246,7 +247,7 @@ class WindowDate(QMainWindow):
     def __init__(self, parentWindow):
         super(WindowDate, self).__init__()
         self.parentWindow = parentWindow
-        uic.loadUi(resourcePath('calendar.ui'), self)
+        uic.loadUi(resourcePath('assets/ui/calendar.ui'), self)
         self.setWindowIcon(QtGui.QIcon(resourcePath('icon.ico')))
         self.setWindowModality(QtCore.Qt.ApplicationModal)
         self.setFixedSize(500, 400)
@@ -293,7 +294,7 @@ if __name__ == "__main__":
     current_lang = config.getString("current_lang", "en_us")
     config.save()
 
-    lang = Lang(resourcePath('lang.json'), current_lang)
+    lang = Lang(resourcePath('assets/lang/lang.json'), current_lang)
 
     try:
         with open(last_file, 'r', encoding='utf8') as f:
@@ -305,7 +306,7 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
 
-    splashPixmap = QPixmap(resourcePath("splash.png"))
+    splashPixmap = QPixmap(resourcePath("assets/textures/splash.png"))
     splash = QSplashScreen(splashPixmap, QtCore.Qt.WindowStaysOnTopHint)
     splash.setMask(splashPixmap.mask())
 
