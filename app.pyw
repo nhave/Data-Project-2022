@@ -33,6 +33,8 @@ class WindowMain(QMainWindow):
         self.actionAdd.triggered.connect(self.addItem)
         self.actionEdit.triggered.connect(self.editItem)
         self.actionRemove.triggered.connect(self.removeItem)
+        self.actionPreferences.triggered.connect(self.openPreferences)
+        self.actionPreferences.setEnabled(False)
         # Adding the Context Menu and its Event.
         self.tableItems.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.tableItems.customContextMenuRequested.connect(self.contextMenu)
@@ -60,12 +62,12 @@ class WindowMain(QMainWindow):
         )
 
     def addItem(self):
-        self.windowadd = WindowAdd(self, False)
-        self.windowadd.show()
+        self.windowAdd = WindowAdd(self, False)
+        self.windowAdd.show()
 
     def editItem(self):
-        self.windowadd = WindowAdd(self, True)
-        self.windowadd.show()
+        self.windowAdd = WindowAdd(self, True)
+        self.windowAdd.show()
 
     def removeItem(self):
         row = self.tableItems.currentItem().row()
@@ -92,7 +94,6 @@ class WindowMain(QMainWindow):
 
         for row in range(len(rows)):
             item = QtWidgets.QTableWidgetItem()
-            # item.setText(_translate("MainWindow", rows[row]))
             item.setText(lang.translate(rows[row]))
             self.tableItems.setHorizontalHeaderItem(row, item)
 
@@ -105,6 +106,8 @@ class WindowMain(QMainWindow):
                 item.setText(packages[row][column])
                 self.tableItems.setItem(row, column, item)
         
+        if(self.tableItems.currentItem() == None):
+            self.tableItems.selectRow(0)
         self.actionRemove.setEnabled(len(packages) > 0)
         self.actionEdit.setEnabled(len(packages) > 0)
 
@@ -137,8 +140,6 @@ class WindowMain(QMainWindow):
     def importItems(self):
         global packages
 
-        # last_file = config.getString("last_file", "./")
-
         filename, ok = QFileDialog.getOpenFileName(
             self,
             lang.translate("file.import"),
@@ -157,6 +158,10 @@ class WindowMain(QMainWindow):
                         self.updateItems()
             except:
                 pass
+
+    def openPreferences(self):
+        self.windowPreferences = WindowPreferences(self)
+        self.windowPreferences.show()
 
     def localize(self):
         self.setWindowTitle(lang.translate("windowmain.title"))
@@ -180,7 +185,7 @@ class WindowAdd(QMainWindow):
         super(WindowAdd, self).__init__()
         self.parentWindow = parentWindow
         uic.loadUi(resourcePath('assets/ui/add.ui'), self)
-        self.setWindowIcon(QtGui.QIcon(resourcePath('icon.ico')))
+        self.setWindowIcon(QtGui.QIcon(resourcePath('assets/textures/icon.ico')))
         self.setWindowModality(QtCore.Qt.ApplicationModal)
         self.setFixedSize(400, 208)
         self.connectSignalSlots()
@@ -222,6 +227,8 @@ class WindowAdd(QMainWindow):
             packages[row] = [id, content, amount, date]
 
         self.parentWindow.updateItems()
+        if not self.edit:
+            self.parentWindow.tableItems.selectRow(len(packages)-1)
         self.close()
 
     def openCalendar(self):
@@ -248,7 +255,7 @@ class WindowDate(QMainWindow):
         super(WindowDate, self).__init__()
         self.parentWindow = parentWindow
         uic.loadUi(resourcePath('assets/ui/calendar.ui'), self)
-        self.setWindowIcon(QtGui.QIcon(resourcePath('icon.ico')))
+        self.setWindowIcon(QtGui.QIcon(resourcePath('assets/textures/icon.ico')))
         self.setWindowModality(QtCore.Qt.ApplicationModal)
         self.setFixedSize(500, 400)
         self.connectSignalSlots()
@@ -268,6 +275,17 @@ class WindowDate(QMainWindow):
     def localize(self):
         self.setWindowTitle(lang.translate("windowcalendar.title"))
         self.buttonSet.setText(lang.translate("button.set"))
+
+class WindowPreferences(QMainWindow):
+    def __init__(self, parentWindow):
+        super(WindowPreferences, self).__init__()
+        self.parentWindow = parentWindow
+        uic.loadUi(resourcePath('assets/ui/add.ui'), self)
+        self.setWindowIcon(QtGui.QIcon(resourcePath('assets/textures/icon.ico')))
+        self.setWindowModality(QtCore.Qt.ApplicationModal)
+        self.setFixedSize(400, 208)
+        self.connectSignalSlots()
+        self.localize()
 
 # Returns the resource path for assets for use in the EXE file.
 def resourcePath(relativePath):
