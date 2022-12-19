@@ -9,11 +9,14 @@ class Lang:
         try:
             with open(self.__jsonFile, 'r', encoding='utf8') as f:
                 conf = json.load(f)
-                if type(conf.get(language)) == dict:
+                if type(conf) == dict:
                     self.__lang = conf.get(language)
+                    self.__languages = []
+                    for lang in conf:
+                        out = [lang, conf.get(lang).get("language.name")]
+                        self.__languages.append(out)
         except:
             self.__lang = {}
-        pass
 
     def setLanguage(self, language):
         self.__load(language)
@@ -26,4 +29,6 @@ class Lang:
             return out
         except:
             return value
-        pass
+
+    def listLanguages(self):
+        return self.__languages

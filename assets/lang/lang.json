@@ -1,8 +1,9 @@
 {
     "en_us": {
-        "settings.language": "English",
+        "language.name": "English",
         "windowmain.title": "N-TECH Package Manager",
         "windowcalendar.title": "Set Date",
+        "windowpreferences.title": "Preferences",
         "windowerror.title": "Error",
         "windowerror.message": "Lines cannot be empty!",
         "windowremove.title": "Remove",
@@ -31,12 +32,15 @@
         "button.done": "Done",
         "button.cancel": "Cancel",
         "button.calendar": "Calendar",
-        "button.set": "Set"
+        "button.set": "Set",
+        "settings.language": "Language",
+        "settings.langchange": "* Language change apply on next restart"
     },
     "da_dk": {
-        "settings.language": "Dansk",
+        "language.name": "Dansk",
         "windowmain.title": "N-TECH Pakke Håndtering",
         "windowcalendar.title": "Sæt Dato",
+        "windowpreferences.title": "Indstillinger",
         "windowerror.title": "Fejl",
         "windowerror.message": "Linjerne må ikke være tomme!",
         "windowremove.title": "Fjern",
@@ -65,6 +69,8 @@
         "button.done": "Færdig",
         "button.cancel": "Annuller",
         "button.calendar": "Kalender",
-        "button.set": "Sæt"
+        "button.set": "Sæt",
+        "settings.language": "Sprog",
+        "settings.langchange": "* Ændringer på sprog træder i kraft ved næste genstart"
     }
 }

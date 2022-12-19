@@ -34,7 +34,6 @@ class WindowMain(QMainWindow):
         self.actionEdit.triggered.connect(self.editItem)
         self.actionRemove.triggered.connect(self.removeItem)
         self.actionPreferences.triggered.connect(self.openPreferences)
-        self.actionPreferences.setEnabled(False)
         # Adding the Context Menu and its Event.
         self.tableItems.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.tableItems.customContextMenuRequested.connect(self.contextMenu)
@@ -187,7 +186,7 @@ class WindowAdd(QMainWindow):
         uic.loadUi(resourcePath('assets/ui/add.ui'), self)
         self.setWindowIcon(QtGui.QIcon(resourcePath('assets/textures/icon.ico')))
         self.setWindowModality(QtCore.Qt.ApplicationModal)
-        self.setFixedSize(400, 208)
+        self.setFixedSize(400, 200)
         self.connectSignalSlots()
         self.updateLines(edit)
         self.localize(edit)
@@ -280,12 +279,46 @@ class WindowPreferences(QMainWindow):
     def __init__(self, parentWindow):
         super(WindowPreferences, self).__init__()
         self.parentWindow = parentWindow
-        uic.loadUi(resourcePath('assets/ui/add.ui'), self)
+        uic.loadUi(resourcePath('assets/ui/preferences.ui'), self)
         self.setWindowIcon(QtGui.QIcon(resourcePath('assets/textures/icon.ico')))
         self.setWindowModality(QtCore.Qt.ApplicationModal)
-        self.setFixedSize(400, 208)
+        self.setFixedSize(400, 200)
         self.connectSignalSlots()
         self.localize()
+        self.updateItem()
+    
+    def connectSignalSlots(self):
+        self.buttonDone.clicked.connect(self.done)
+        self.comboBoxLang.activated.connect(self.comboBox)
+    
+    def updateItem(self):
+        # test = QtWidgets.QComboBox()
+        # test.setCurrentIndex
+        self.labelLangChange.hide()
+        langs = lang.listLanguages()
+        for i in range(len(langs)):
+            self.comboBoxLang.addItem(langs[i][1])
+            if langs[i][0] == current_lang:
+                self.comboBoxLang.setCurrentIndex(i)
+    
+    def comboBox(self):
+        index = self.comboBoxLang.currentIndex()
+        langs = lang.listLanguages()
+        if langs[index][0] == current_lang:
+            self.labelLangChange.hide()
+        else:
+            self.labelLangChange.show()
+        config.setString("current_lang", langs[index][0])
+    
+    def done(self):
+        config.save()
+        self.close()
+    
+    def localize(self):
+        self.setWindowTitle(lang.translate("windowpreferences.title"))
+        self.labelLanguage.setText(lang.translate("settings.language"))
+        self.labelLangChange.setText(lang.translate("settings.langchange"))
+        self.buttonDone.setText(lang.translate("button.done"))
 
 # Returns the resource path for assets for use in the EXE file.
 def resourcePath(relativePath):
