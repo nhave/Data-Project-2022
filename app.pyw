@@ -9,6 +9,12 @@ from pathlib import Path
 from config import Config
 from language import Lang
 
+if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
+    QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
+
+if hasattr(QtCore.Qt, 'AA_UseHighDpiPixmaps'):
+    QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
+
 rows = ["table.package", "table.content", "table.amount", "table.date"]
 packages = []
 

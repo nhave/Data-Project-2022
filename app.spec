@@ -26,6 +26,7 @@ a.datas += [
     ('assets/ui/mainwindow.ui', './assets/ui/mainwindow.ui', "DATA"),
     ('assets/ui/add.ui', './assets/ui/add.ui', "DATA"),
     ('assets/ui/calendar.ui', './assets/ui/calendar.ui', "DATA"),
+    ('assets/ui/preferences.ui', './assets/ui/preferences.ui', "DATA"),
     ('assets/lang/lang.json', './assets/lang/lang.json', "DATA")
 ]
 
@@ -51,5 +52,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['./icon.ico'],
+    icon=['./assets/textures/icon.ico'],
 )
