@@ -59,7 +59,7 @@ class WindowMain(QMainWindow):
     def about(self):
         QMessageBox.about(
             self,
-            lang.translate("main.title"),
+            lang.translate("windowmain.title"),
             lang.translate("about.desc") +
             lang.translate("about.version") + ": 1.0.0<br>" +
             lang.translate("about.author") + ": NHAVE<br>"
